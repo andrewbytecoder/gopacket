@@ -48,11 +48,12 @@ func (k *Kcp) Run() error {
 
 		// A nil packet indicates the end of a pcap file.
 		if packet == nil {
+			fmt.Println("文件解析完毕")
 			return nil
 		}
 
 		if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeUDP {
-			log.Println("not udp packet continue")
+			log.Println("not udp packet continue", packet)
 			continue
 		}
 
