@@ -38,9 +38,9 @@ func (k *Kcp) Run() error {
 	}
 	defer handle.Close()
 
-	fmt.Printf("开始解析文件: %s\n", k.filename)
+	fmt.Printf("开始解析文件：%s\n", k.filename)
+	fmt.Printf("链路层类型：%v (%d)\n", handle.LinkType(), int(handle.LinkType()))
 	fmt.Println("------------------------------------------------------------")
-
 	// 创建数据包源
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	// 2. 遍历每一个数据包
