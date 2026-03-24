@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"net"
@@ -11,8 +12,79 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// KCP Protocol Constants
+const (
+	// Retransmission Timeout (RTO) bounds, in milliseconds
+	IKCP_RTO_NDL = 30    // no-delay mode: minimum RTO (ms)
+	IKCP_RTO_MIN = 100   // normal mode: minimum RTO (ms)
+	IKCP_RTO_DEF = 200   // default RTO (ms)
+	IKCP_RTO_MAX = 60000 // maximum RTO (ms), 60 seconds
+
+	// Command types for the KCP segment header (cmd field)
+	IKCP_CMD_PUSH = 81 // cmd: push data
+	IKCP_CMD_ACK  = 82 // cmd: acknowledge
+	IKCP_CMD_WASK = 83 // cmd: window probe request (ask)
+	IKCP_CMD_WINS = 84 // cmd: window size response (tell)
+
+	// Probe flags (bitfield), set in kcp.probe to schedule probe commands
+	IKCP_ASK_SEND = 1 // schedule sending IKCP_CMD_WASK
+	IKCP_ASK_TELL = 2 // schedule sending IKCP_CMD_WINS
+
+	// Default window and MTU sizes
+	IKCP_WND_SND = 32   // default send window size (packets)
+	IKCP_WND_RCV = 32   // default receive window size (packets)
+	IKCP_MTU_DEF = 1400 // default MTU (bytes, not including UDP/IP header)
+
+	// Protocol parameters
+	IKCP_ACK_FAST    = 3      // fast retransmit trigger threshold (duplicate ACK count)
+	IKCP_INTERVAL    = 100    // default flush interval (ms)
+	IKCP_OVERHEAD    = 24     // per-segment header size: conv(4) + cmd(1) + frg(1) + wnd(2) + ts(4) + sn(4) + una(4) + len(4)
+	IKCP_DEADLINK    = 20     // max retransmissions before declaring dead link
+	IKCP_THRESH_INIT = 2      // initial slow-start threshold (packets)
+	IKCP_THRESH_MIN  = 2      // minimum slow-start threshold (packets)
+	IKCP_PROBE_INIT  = 500    // initial window probe timeout (ms)
+	IKCP_PROBE_LIMIT = 120000 // maximum window probe timeout (ms), 120 seconds
+	IKCP_SN_OFFSET   = 12     // byte offset of sequence number (sn) within the segment header
+)
+
 type Kcp struct {
 	filename string
+}
+
+// segment defines a KCP segment
+type segment struct {
+	conv     uint32
+	cmd      uint8
+	frg      uint8
+	wnd      uint16
+	ts       uint32
+	sn       uint32
+	una      uint32
+	rto      uint32
+	xmit     uint32
+	resendts uint32
+	fastack  uint32
+	acked    uint32 // mark if the seg has acked
+	len      uint32
+	data     []byte
+}
+
+func decode(ptr []byte) *segment {
+	_ = ptr[IKCP_OVERHEAD-1] // BCE hint
+
+	seg := &segment{}
+
+	seg.conv = binary.LittleEndian.Uint32(ptr)
+	seg.cmd = ptr[4]
+	seg.frg = ptr[5]
+	seg.wnd = binary.LittleEndian.Uint16(ptr[6:])
+	seg.ts = binary.LittleEndian.Uint32(ptr[8:])
+	seg.sn = binary.LittleEndian.Uint32(ptr[12:])
+	seg.una = binary.LittleEndian.Uint32(ptr[16:])
+	seg.len = binary.LittleEndian.Uint32(ptr[20:])
+	seg.data = ptr[24:]
+
+	return seg
 }
 
 func New() *Kcp {
@@ -71,6 +143,8 @@ func (k *Kcp) Run() error {
 
 		// 5. 获取 UDP 载荷 (Payload)
 		payload := udp.LayerPayload()
+
+		fmt.Print(decode(udp.LayerPayload()))
 
 		// 6. 格式化输出
 		// 尝试将载荷转换为字符串，如果包含不可打印字符，则显示 Hex
