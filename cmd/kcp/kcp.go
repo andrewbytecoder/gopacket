@@ -88,19 +88,6 @@ func decode(ptr []byte) *Segment {
 	return seg
 }
 
-// MarshalJSON 实现 json.Marshaler 接口
-func (s *Segment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(s)
-}
-
-// UnmarshalJSON 实现 json.Unmarshaler 接口
-func (s *Segment) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, s); err != nil {
-		return err
-	}
-	return nil
-}
-
 func New() *Kcp {
 	return &Kcp{}
 }
@@ -158,7 +145,7 @@ func (k *Kcp) Run() error {
 		// 5. 获取 UDP 载荷 (Payload)
 		payload := udp.LayerPayload()
 
-		jsonByte, err := decode(udp.LayerPayload()).MarshalJSON()
+		jsonByte, err := json.Marshal(decode(udp.LayerPayload()))
 		if err != nil {
 			log.Println("json marshal failed")
 			continue
