@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -51,40 +52,53 @@ type Kcp struct {
 	filename string
 }
 
-// segment defines a KCP segment
-type segment struct {
-	conv     uint32
-	cmd      uint8
-	frg      uint8
-	wnd      uint16
-	ts       uint32
-	sn       uint32
-	una      uint32
-	rto      uint32
-	xmit     uint32
-	resendts uint32
-	fastack  uint32
-	acked    uint32 // mark if the seg has acked
-	len      uint32
-	data     []byte
+// Segment defines a KCP segment
+type Segment struct {
+	Conv     uint32 `json:"conv"`     // 会话 ID
+	Cmd      uint8  `json:"cmd"`      // 命令类型
+	Frg      uint8  `json:"frg"`      // 分片数量
+	Wnd      uint16 `json:"wnd"`      // 窗口大小
+	Ts       uint32 `json:"ts"`       // 时间戳
+	SN       uint32 `json:"sn"`       // 序列号
+	Una      uint32 `json:"una"`      // 未确认序号
+	Rto      uint32 `json:"rto"`      // 重传超时
+	Xmit     uint32 `json:"xmit"`     // 传输次数
+	Resendts uint32 `json:"resendts"` // 重传时间戳
+	Fastack  uint32 `json:"fastack"`  // 快速确认数
+	Acked    uint32 `json:"acked"`    // 是否已确认
+	Len      uint32 `json:"len"`      // 数据长度
+	Data     []byte `json:"data"`     // 载荷数据
 }
 
-func decode(ptr []byte) *segment {
+func decode(ptr []byte) *Segment {
 	_ = ptr[IKCP_OVERHEAD-1] // BCE hint
 
-	seg := &segment{}
+	seg := &Segment{}
 
-	seg.conv = binary.LittleEndian.Uint32(ptr)
-	seg.cmd = ptr[4]
-	seg.frg = ptr[5]
-	seg.wnd = binary.LittleEndian.Uint16(ptr[6:])
-	seg.ts = binary.LittleEndian.Uint32(ptr[8:])
-	seg.sn = binary.LittleEndian.Uint32(ptr[12:])
-	seg.una = binary.LittleEndian.Uint32(ptr[16:])
-	seg.len = binary.LittleEndian.Uint32(ptr[20:])
-	seg.data = ptr[24:]
+	seg.Conv = binary.LittleEndian.Uint32(ptr)
+	seg.Cmd = ptr[4]
+	seg.Frg = ptr[5]
+	seg.Wnd = binary.LittleEndian.Uint16(ptr[6:])
+	seg.Ts = binary.LittleEndian.Uint32(ptr[8:])
+	seg.SN = binary.LittleEndian.Uint32(ptr[12:])
+	seg.Una = binary.LittleEndian.Uint32(ptr[16:])
+	seg.Len = binary.LittleEndian.Uint32(ptr[20:])
+	seg.Data = ptr[24:]
 
 	return seg
+}
+
+// MarshalJSON 实现 json.Marshaler 接口
+func (s *Segment) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s)
+}
+
+// UnmarshalJSON 实现 json.Unmarshaler 接口
+func (s *Segment) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, s); err != nil {
+		return err
+	}
+	return nil
 }
 
 func New() *Kcp {
@@ -143,6 +157,14 @@ func (k *Kcp) Run() error {
 
 		// 5. 获取 UDP 载荷 (Payload)
 		payload := udp.LayerPayload()
+
+		jsonByte, err := decode(udp.LayerPayload()).MarshalJSON()
+		if err != nil {
+			log.Println("json marshal failed")
+			continue
+		}
+
+		fmt.Println(string(jsonByte))
 
 		fmt.Print(decode(udp.LayerPayload()))
 
