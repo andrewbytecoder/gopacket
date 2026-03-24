@@ -10,3 +10,9 @@ Minimum Go version required is 1.5 except for pcapgo/EthernetHandle, afpacket, a
 
 Originally forked from the gopcap project written by Andreas
 Krennmair <ak@synflood.at> (http://github.com/akrennmair/gopcap).
+
+
+
+```bash
+export CGO_ENABLED=1
+```
