@@ -42,7 +42,7 @@ func (k *Kcp) Run() error {
 	fmt.Printf("链路层类型：%v (%d)\n", handle.LinkType(), int(handle.LinkType()))
 	fmt.Println("------------------------------------------------------------")
 	// 创建数据包源
-	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+	packetSource := gopacket.NewPacketSource(handle, layers.LinkTypeLinuxSLL)
 	// 2. 遍历每一个数据包
 	for packet := range packetSource.Packets() {
 
