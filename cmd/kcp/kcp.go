@@ -52,7 +52,7 @@ func (k *Kcp) Run() error {
 			return nil
 		}
 
-		if packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeUDP {
+		if packet.LinkLayer() == nil || packet.NetworkLayer() == nil || packet.TransportLayer() == nil || packet.TransportLayer().LayerType() != layers.LayerTypeUDP {
 			log.Println("not udp packet continue", packet)
 			continue
 		}
