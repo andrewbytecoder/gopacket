@@ -85,7 +85,7 @@ const (
 
 // LinkType is an enumeration of link types, and acts as a decoder for any
 // link type it supports.
-type LinkType uint8
+type LinkType uint16
 
 const (
 	// According to pcap-linktype(7) and http://www.tcpdump.org/linktypes.html
@@ -106,6 +106,7 @@ const (
 	LinkTypeFRelay         LinkType = 107
 	LinkTypeLoop           LinkType = 108
 	LinkTypeLinuxSLL       LinkType = 113
+	LinkTypeLinuxSLL2      LinkType = 276
 	LinkTypeLTalk          LinkType = 114
 	LinkTypePFLog          LinkType = 117
 	LinkTypePrismHeader    LinkType = 119
@@ -384,6 +385,7 @@ func initActualTypeData() {
 	LinkTypeMetadata[LinkTypeIEEE80211Radio] = EnumMetadata{DecodeWith: gopacket.DecodeFunc(decodeRadioTap), Name: "RadioTap"}
 	LinkTypeMetadata[LinkTypeLinuxUSB] = EnumMetadata{DecodeWith: gopacket.DecodeFunc(decodeUSB), Name: "USB"}
 	LinkTypeMetadata[LinkTypeLinuxSLL] = EnumMetadata{DecodeWith: gopacket.DecodeFunc(decodeLinuxSLL), Name: "Linux SLL"}
+	LinkTypeMetadata[LinkTypeLinuxSLL2] = EnumMetadata{DecodeWith: gopacket.DecodeFunc(decodeLinuxSLL2), Name: "Linux SLL2"}
 	LinkTypeMetadata[LinkTypePrismHeader] = EnumMetadata{DecodeWith: gopacket.DecodeFunc(decodePrismHeader), Name: "Prism"}
 
 	FDDIFrameControlMetadata[FDDIFrameControlLLC] = EnumMetadata{DecodeWith: gopacket.DecodeFunc(decodeLLC), Name: "LLC"}

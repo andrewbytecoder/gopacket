@@ -28,38 +28,43 @@ func init() {
 
 // Decoder calls LinkTypeMetadata.DecodeWith's decoder.
 func (a LinkType) Decode(data []byte, p gopacket.PacketBuilder) error {
-	return LinkTypeMetadata[a].DecodeWith.Decode(data, p)
+	return a.linkTypeMetadata().DecodeWith.Decode(data, p)
 }
 
 // String returns LinkTypeMetadata.Name.
 func (a LinkType) String() string {
-	return LinkTypeMetadata[a].Name
+	return a.linkTypeMetadata().Name
 }
 
 // LayerType returns LinkTypeMetadata.LayerType.
 func (a LinkType) LayerType() gopacket.LayerType {
-	return LinkTypeMetadata[a].LayerType
+	return a.linkTypeMetadata().LayerType
 }
 
-type errorDecoderForLinkType int
+type errorDecoderForLinkType struct {
+	linkType LinkType
+}
 
 func (a *errorDecoderForLinkType) Decode(data []byte, p gopacket.PacketBuilder) error {
 	return a
 }
 func (a *errorDecoderForLinkType) Error() string {
-	return fmt.Sprintf("Unable to decode LinkType %d", int(*a))
+	return fmt.Sprintf("Unable to decode LinkType %d", int(a.linkType))
 }
 
-var errorDecodersForLinkType [256]errorDecoderForLinkType
-var LinkTypeMetadata [256]EnumMetadata
+var LinkTypeMetadata map[LinkType]EnumMetadata
 
 func initUnknownTypesForLinkType() {
-	for i := 0; i < 256; i++ {
-		errorDecodersForLinkType[i] = errorDecoderForLinkType(i)
-		LinkTypeMetadata[i] = EnumMetadata{
-			DecodeWith: &errorDecodersForLinkType[i],
-			Name:       "UnknownLinkType",
-		}
+	LinkTypeMetadata = make(map[LinkType]EnumMetadata)
+}
+
+func (a LinkType) linkTypeMetadata() EnumMetadata {
+	if md, ok := LinkTypeMetadata[a]; ok {
+		return md
+	}
+	return EnumMetadata{
+		DecodeWith: &errorDecoderForLinkType{linkType: a},
+		Name:       "UnknownLinkType",
 	}
 }
 

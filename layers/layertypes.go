@@ -115,6 +115,7 @@ var (
 	LayerTypeUSBInterrupt                 = gopacket.RegisterLayerType(111, gopacket.LayerTypeMetadata{Name: "USBInterrupt", Decoder: gopacket.DecodeFunc(decodeUSBInterrupt)})
 	LayerTypeUSBBulk                      = gopacket.RegisterLayerType(112, gopacket.LayerTypeMetadata{Name: "USBBulk", Decoder: gopacket.DecodeFunc(decodeUSBBulk)})
 	LayerTypeLinuxSLL                     = gopacket.RegisterLayerType(113, gopacket.LayerTypeMetadata{Name: "Linux SLL", Decoder: gopacket.DecodeFunc(decodeLinuxSLL)})
+	LayerTypeLinuxSLL2                    = gopacket.RegisterLayerType(276, gopacket.LayerTypeMetadata{Name: "Linux SLL2", Decoder: gopacket.DecodeFunc(decodeLinuxSLL2)})
 	LayerTypeSFlow                        = gopacket.RegisterLayerType(114, gopacket.LayerTypeMetadata{Name: "SFlow", Decoder: gopacket.DecodeFunc(decodeSFlow)})
 	LayerTypePrismHeader                  = gopacket.RegisterLayerType(115, gopacket.LayerTypeMetadata{Name: "Prism monitor mode header", Decoder: gopacket.DecodeFunc(decodePrismHeader)})
 	LayerTypeVXLAN                        = gopacket.RegisterLayerType(116, gopacket.LayerTypeMetadata{Name: "VXLAN", Decoder: gopacket.DecodeFunc(decodeVXLAN)})
