@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
+	"github.com/andrewbytecoder/gopacket"
+	"github.com/andrewbytecoder/gopacket/layers"
 )
 
 var netFlow gopacket.Flow
@@ -1061,7 +1061,7 @@ func TestKeepSimpleNotBoundaryAlreadyKept(t *testing.T) {
 				Seq:       1000,
 				BaseLayer: layers.BaseLayer{Payload: []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0x10}},
 			},
-			keep: 0, // 1â†’10
+			keep: 0, // 1â†?0
 			want: []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0x10},
 		},
 		{
@@ -1071,7 +1071,7 @@ func TestKeepSimpleNotBoundaryAlreadyKept(t *testing.T) {
 				Seq:       1007,
 				BaseLayer: layers.BaseLayer{Payload: []byte{7, 8, 9, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15}},
 			},
-			keep: 11, // 12â†’15
+			keep: 11, // 12â†?5
 			want: []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15},
 		},
 		{

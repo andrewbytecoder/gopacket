@@ -2,8 +2,8 @@
 
 set -ev
 
-go get github.com/google/gopacket
-go get github.com/google/gopacket/layers
-go get github.com/google/gopacket/tcpassembly
-go get github.com/google/gopacket/reassembly
-go get github.com/google/gopacket/pcapgo
+go get github.com/andrewbytecoder/gopacket
+go get github.com/andrewbytecoder/gopacket/layers
+go get github.com/andrewbytecoder/gopacket/tcpassembly
+go get github.com/andrewbytecoder/gopacket/reassembly
+go get github.com/andrewbytecoder/gopacket/pcapgo

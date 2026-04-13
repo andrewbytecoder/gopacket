@@ -7,9 +7,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
-	"github.com/google/gopacket/pcap"
+	"github.com/andrewbytecoder/gopacket"
+	"github.com/andrewbytecoder/gopacket/layers"
+	"github.com/andrewbytecoder/gopacket/pcap"
 	"github.com/spf13/cobra"
 )
 
@@ -58,14 +58,14 @@ type Segment struct {
 	Cmd      uint8  `json:"cmd"`      // 命令类型
 	Frg      uint8  `json:"frg"`      // 分片数量
 	Wnd      uint16 `json:"wnd"`      // 窗口大小
-	Ts       uint32 `json:"ts"`       // 时间戳
-	SN       uint32 `json:"sn"`       // 序列号
-	Una      uint32 `json:"una"`      // 未确认序号
+	Ts       uint32 `json:"ts"`       // 时间�?
+	SN       uint32 `json:"sn"`       // 序列�?
+	Una      uint32 `json:"una"`      // 未确认序�?
 	Rto      uint32 `json:"rto"`      // 重传超时
 	Xmit     uint32 `json:"xmit"`     // 传输次数
-	Resendts uint32 `json:"resendts"` // 重传时间戳
+	Resendts uint32 `json:"resendts"` // 重传时间�?
 	Fastack  uint32 `json:"fastack"`  // 快速确认数
-	Acked    uint32 `json:"acked"`    // 是否已确认
+	Acked    uint32 `json:"acked"`    // 是否已确�?
 	Len      uint32 `json:"len"`      // 数据长度
 	Data     []byte `json:"data"`     // 载荷数据
 }
@@ -130,12 +130,12 @@ func (k *Kcp) Run() error {
 			continue
 		}
 
-		// 提取具体的 IP 信息
+		// 提取具体�?IP 信息
 		var srcIP, dstIP net.IP
 		srcIP = packet.NetworkLayer().NetworkFlow().Src().Raw()
 		dstIP = packet.NetworkLayer().NetworkFlow().Dst().Raw()
 
-		// 3. 解析 UDP 层
+		// 3. 解析 UDP �?
 		udp, ok := packet.TransportLayer().(*layers.UDP)
 		if !ok {
 			log.Println("get udp data failed")
@@ -155,21 +155,18 @@ func (k *Kcp) Run() error {
 
 		fmt.Print(decode(udp.LayerPayload()))
 
-		// 6. 格式化输出
-		// 尝试将载荷转换为字符串，如果包含不可打印字符，则显示 Hex
+		// 6. 格式化输�?		// 尝试将载荷转换为字符串，如果包含不可打印字符，则显示 Hex
 		dataStr := string(payload)
 		isPrintable := true
 		for _, b := range payload {
 			if b < 32 || b > 126 {
-				// 简单的启发式判断：如果有非 ASCII 可打印字符，可能不是纯文本
-				// 注意：这只是一个简单判断，DNS 等二进制协议会被判定为非文本
+				// 简单的启发式判断：如果有非 ASCII 可打印字符，可能不是纯文�?				// 注意：这只是一个简单判断，DNS 等二进制协议会被判定为非文本
 				isPrintable = false
 				break
 			}
 		}
 
-		// 为了演示，如果是 DNS (端口 53) 或其他已知二进制协议，强制显示 Hex 或部分信息
-		// 这里简单处理：如果长度很短且看起来像文本，打印文本，否则打印 Hex 摘要
+		// 为了演示，如果是 DNS (端口 53) 或其他已知二进制协议，强制显�?Hex 或部分信�?		// 这里简单处理：如果长度很短且看起来像文本，打印文本，否则打�?Hex 摘要
 		var contentPreview string
 		if isPrintable && len(payload) > 0 {
 			contentPreview = dataStr
@@ -192,7 +189,7 @@ func (k *Kcp) Run() error {
 	return nil
 }
 
-// 辅助函数：获取前几个字节的十六进制表示
+// 辅助函数：获取前几个字节的十六进制表�?
 func getHexPreview(data []byte) []byte {
 	if len(data) > 8 {
 		return data[:8]

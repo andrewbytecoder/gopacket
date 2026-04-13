@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/gopacket"
+	"github.com/andrewbytecoder/gopacket"
 )
 
 func TestDecodeAndEncode(t *testing.T) {

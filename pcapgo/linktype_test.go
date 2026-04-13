@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"testing"
 
-	"github.com/google/gopacket/layers"
+	"github.com/andrewbytecoder/gopacket/layers"
 )
 
 func TestReaderPreservesHighLinkType(t *testing.T) {
